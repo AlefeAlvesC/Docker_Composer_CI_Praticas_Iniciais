@@ -31,7 +31,7 @@ services:
       # O App se conecta como root usando a senha do root
       MYSQL_HOST: db
       MYSQL_USER: root
-      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DB: ${MYSQL_DATABASE}
       PORT: 3000
     networks:
