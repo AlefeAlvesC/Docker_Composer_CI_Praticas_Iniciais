@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: todo-db
+    restart: always
+    environment:
+      # O MySQL só precisa do ROOT_PASSWORD e do DATABASE aqui
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - todo-mysql-data:/var/lib/mysql
+    networks:
+      - todo-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      # O App se conecta como root usando a senha do root
+      MYSQL_HOST: db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DB: ${MYSQL_DATABASE}
+      PORT: 3000
+    networks:
+      - todo-net
+    depends_on:
+      db:
+        condition: service_healthy
+
+networks:
+  todo-net:
+    name: todo-net
+
+volumes:
+  todo-mysql-data:
+    name: todo-mysql-data

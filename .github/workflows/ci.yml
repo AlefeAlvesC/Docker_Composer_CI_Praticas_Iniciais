@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Criar .env para o CI
+        run: cp .env.example .env
+
+      - name: Validar o compose
+        run: docker compose config
+
+      - name: Build da imagem
+        # No seu compose.yaml, o serviço se chama 'app'
+        run: docker compose build app
+
+      - name: Subir a stack
+        run: docker compose up -d
+
+      - name: Aguardar a aplicação responder
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/items > /dev/null; then
+              echo "Aplicacao no ar!"
+              exit 0
+            fi
+            echo "tentativa $i..."
+            sleep 3
+          done
+          echo "A aplicacao nao subiu a tempo"
+          docker compose logs
+          exit 1
+
+      - name: Smoke test do CRUD
+        run: |
+          curl -sf -X POST http://localhost:3000/items \
+            -H 'Content-Type: application/json' \
+            -d '{"id":"ci-test-1","name":"tarefa criada pelo CI","completed":false}'
+          echo ""
+          curl -sf http://localhost:3000/items | tee resposta.json
+          grep -q "tarefa criada pelo CI" resposta.json
+
+      - name: Logs em caso de falha
+        if: failure()
+        run: docker compose logs
+
+      - name: Derrubar a stack
+        if: always()
+        run: docker compose down -v
