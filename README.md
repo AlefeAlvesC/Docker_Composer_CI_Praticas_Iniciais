@@ -116,6 +116,81 @@ Durante o desenvolvimento do projeto e a conteinerização da aplicação, algun
 * **Desafio:** Garantir o comportamento correto dos dados ao derrubar a stack de contêineres.
 * **Solução:** Mapeamos os dados para um volume nomeado (`todo-mysql-data`), validando que o uso de `docker compose down` preserva o volume, enquanto `docker compose down -v` remove o volume e redefinindo o banco.
 
+# CD — Publicação no Docker Hub
+
+**Aluno(a):** Álefe Alves da Costa  
+**Turma:** Tarde  
+
+**Usuário do Docker Hub:** alefealvesc
+  
+**Imagem publicada:**  
+`alefealvesc/meu-projeto-docker:latest`
+
+**Link da imagem no Docker Hub:**  
+[[Imagem no Docker Hub](https://hub.docker.com/r/alefealvesc/meu-projeto-docker)]
+
+**Dispara quando:** `push` na branch `master`
+
+**Arquivo do workflow:**  
+`.github/workflows/cd.yml`
+
+---
+
+## Evidências
+
+### Print 1 — Token criado no Docker Hub
+![Token Docker Hub](docs/imagens/print10.png)
+
+---
+
+### Print 2 — Secrets cadastrados no GitHub (`DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN`)
+![Secrets GitHub](docs/imagens/print11.png)
+
+---
+
+### Print 3 — Workflow de CD executado com sucesso na aba Actions
+![Workflow Actions](docs/imagens/print12.png)
+
+---
+
+### Print 4 — Imagem publicada no Docker Hub
+![Imagem Docker Hub](docs/imagens/print13.png)
+
+---
+
+### Print 5 — Comando `docker pull` baixando a imagem publicada
+![Docker Pull](docs/imagens/print14.png)
+
+---
+
+# Respostas
+
+## 1. O que é o Docker Hub?
+
+> É um repositório na nuvem para armazenar, compartilhar e baixar imagens do Docker.
+
+---
+
+## 2. Qual a diferença entre CI e CD?
+
+> **CI (Continuous Integration)**: Automatiza a compilação, os testes e a integração do código a cada atualização.
+
+> **CD (Continuous Delivery/Deployment)**: Automatiza o envio e a implantação da aplicação (ex: subir uma imagem Docker ou publicar no servidor) após a fase de CI.
+
+
+---
+
+## 3. Por que usar token e GitHub Secrets em vez de escrever usuário e senha no `cd.yml`?
+
+> Para proteger credenciais sensíveis. Escrever senhas no código expõe dados em histórico e repositórios. O GitHub Secrets injeta essas informações como variáveis de ambiente apenas durante a execução do pipeline.
+
+---
+
+## 4. O que significa a tag `latest`?
+
+> Aponta para a versão padrão ou mais recente de uma imagem. Se você rodar o docker pull sem especificar uma tag, ele baixará a latest por padrão.
+
+
 ## 9. Checklist de autoavaliação
 
 - [x] Dockerfile multi-stage funcionando
